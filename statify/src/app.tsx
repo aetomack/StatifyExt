@@ -15,11 +15,6 @@ class App extends React.Component<{}, {count: number}> {
 
   stopConfettiTimeout: NodeJS.Timeout | null = null;
 
-useEffect(() => {
-  const hash = window.location.hash
-  let token = window.localStorage.getItem("token")
-}, [])
-
   onButtonClick = () => {
     this.setState((state) => {
       return {

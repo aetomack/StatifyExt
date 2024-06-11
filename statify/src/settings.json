@@ -2,5 +2,6 @@
   "displayName": "Statify",
   "nameId": "statify",
   "icon": "css/icon.svg",
+  "hover": "css/hover.svg",
   "activeIcon": "css/active.svg"
 }

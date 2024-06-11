@@ -4,5 +4,5 @@
   }
 
   // Show message on start.
-  Spicetify.showNotification("Welcome!");
+  Spicetify.showNotification("Stats Generated!");
 })()
