@@ -1,32 +1,41 @@
-import styles from './css/app.module.scss';
 import React from 'react';
+import styles from './css/app.module.scss';
 
 const CLIENT_ID = "59ce9c1fe3c94dfdacedb9c57e229ad2";
-const REDIRECT_URI = "http://localhost:3000";  // Ensure this matches your Spotify app settings
+const REDIRECT_URI = "http://localhost:8080";  // Ensure this matches your Spotify app settings
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
 const RESPONSE_TYPE = "token";
 
 interface State {
-  count: number;
   accessToken: string | null;
   topSong: string | null;
 }
 
 class App extends React.Component<{}, State> {
   state: State = {
-    count: 0,
     accessToken: null,
     topSong: null,
   };
 
   componentDidMount() {
-    // Assuming the access token is already stored in localStorage
-    const token = window.localStorage.getItem("token");
-    if (token) {
-      this.setState({ accessToken: token }, () => {
-        this.fetchTopSong();
-      });
+    // Check if the URL contains an access token
+    const hash = window.location.hash;
+    let token = window.localStorage.getItem("token");
+
+    if (!token && hash) {
+      token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token"))?.split("=")[1];
+
+      if (token) {
+        window.location.hash = "";
+        window.localStorage.setItem("token", token);
+      }
     }
+
+    this.setState({ accessToken: token }, () => {
+      if (this.state.accessToken) {
+        this.fetchTopSong();
+      }
+    });
   }
 
   fetchTopSong = async () => {
@@ -54,21 +63,17 @@ class App extends React.Component<{}, State> {
     }
   };
 
-  onButtonClick = () => {
-    this.setState((state) => ({
-      count: state.count + 1,
-    }));
-  };
-
   render() {
-    const { count, topSong } = this.state;
+    const { topSong } = this.state;
 
     return (
       <div className={styles.container}>
         <div className={styles.title}>{"My Custom App!"}</div>
-        <button className={styles.button} onClick={this.onButtonClick}>{"Count up"}</button>
-        <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
-        <div className={styles.counter}>{count}</div>
+        {!this.state.accessToken && (
+          <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>
+            Login to Spotify
+          </a>
+        )}
         {topSong && (
           <div className={styles.topSong}>
             {"Top Song: "}{topSong}
